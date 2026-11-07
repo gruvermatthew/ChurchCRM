@@ -7,6 +7,12 @@ FROM churchcrm/crm:7.8.3-php8-apache
 
 USER root
 
+# mod_php needs the prefork MPM; make sure it is the only MPM enabled
+# (Apache refuses to start with "More than one MPM loaded" otherwise).
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf && \
+    a2enmod mpm_prefork >/dev/null && \
+    apache2ctl -t
+
 # Config.php reads database credentials and the public URL from environment
 # variables, so the setup wizard is not needed and a redeploy never resets it.
 COPY --chown=33:33 railway/Config.php /var/www/html/Include/Config.php
