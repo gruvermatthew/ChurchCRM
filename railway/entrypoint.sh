@@ -14,9 +14,11 @@ done
 # Apache builds its own redirects (e.g. /admin -> /admin/) from ServerName.
 # Without it they point at the container's internal http://...:8080 address.
 host=$(printf '%s' "${CHURCHCRM_URL:-}" | sed -E 's#^https?://([^/:]+).*#\1#')
+# The virtual host takes its port from <VirtualHost *:8080>, so it is set there.
 if [ -n "$host" ]; then
-  printf 'ServerName https://%s:443\nUseCanonicalName On\n' "$host" \
-    > /etc/apache2/conf-enabled/zz-railway-servername.conf
+  sed -i -e '/^\tServerName https:\/\//d' -e '/^\tUseCanonicalName On$/d' \
+    -e "s|^<VirtualHost \*:8080>\$|&\\n\\tServerName https://$host:443\\n\\tUseCanonicalName On|" \
+    /etc/apache2/sites-available/000-default.conf
 fi
 apache2ctl -t
 
