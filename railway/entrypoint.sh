@@ -8,7 +8,9 @@ for m in mpm_event mpm_worker; do
   rm -f "/etc/apache2/mods-enabled/$m.load" "/etc/apache2/mods-enabled/$m.conf"
 done
 [ -e /etc/apache2/mods-enabled/mpm_prefork.load ] || a2enmod mpm_prefork >/dev/null
-[ -e /etc/apache2/mods-enabled/headers.load ] || a2enmod headers >/dev/null
+for m in headers remoteip; do
+  [ -e "/etc/apache2/mods-enabled/$m.load" ] || a2enmod "$m" >/dev/null
+done
 apache2ctl -t
 
 for d in Person Family; do

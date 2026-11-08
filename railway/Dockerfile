@@ -29,7 +29,7 @@ RUN mkdir -p /opt/churchcrm-defaults/Person /opt/churchcrm-defaults/Family && \
 
 COPY railway/security.conf /etc/apache2/conf-enabled/zz-railway-security.conf
 COPY railway/php-security.ini /usr/local/etc/php/conf.d/zz-railway-security.ini
-RUN a2enmod headers >/dev/null
+RUN a2enmod headers remoteip >/dev/null
 
 COPY railway/entrypoint.sh /usr/local/bin/churchcrm-railway-entrypoint
 RUN chmod 0755 /usr/local/bin/churchcrm-railway-entrypoint
