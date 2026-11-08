@@ -11,6 +11,13 @@ done
 for m in headers remoteip; do
   [ -e "/etc/apache2/mods-enabled/$m.load" ] || a2enmod "$m" >/dev/null
 done
+# Apache builds its own redirects (e.g. /admin -> /admin/) from ServerName.
+# Without it they point at the container's internal http://...:8080 address.
+host=$(printf '%s' "${CHURCHCRM_URL:-}" | sed -E 's#^https?://([^/:]+).*#\1#')
+if [ -n "$host" ]; then
+  printf 'ServerName https://%s:443\nUseCanonicalName On\n' "$host" \
+    > /etc/apache2/conf-enabled/zz-railway-servername.conf
+fi
 apache2ctl -t
 
 for d in Person Family; do
